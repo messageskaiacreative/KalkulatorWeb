@@ -483,9 +483,32 @@ input:checked + .slider:before { transform: translateX(20px); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 12px 24px;
   background: var(--bg-main);
   border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: padding 0.3s ease;
+}
+
+.total-info {
+  display: flex;
+  flex-direction: column;
+}
+
+#toggle-numpad-btn {
+  color: var(--text-muted);
+  width: 44px;
+  height: 44px;
+  background: rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#toggle-numpad-btn:hover {
+  background: rgba(0,0,0,0.06);
+}
+
+#toggle-numpad-btn.rotated {
+  transform: rotate(180deg);
 }
 
 .grand-total-bar span {
@@ -509,6 +532,30 @@ input:checked + .slider:before { transform: translateX(20px); }
   gap: 8px;
   padding: 12px 12px 16px;
   background: #E5E7EB;
+  max-height: 400px; /* Allow enough height for transition */
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), padding 0.3s ease, opacity 0.3s ease;
+}
+
+.bottom-area.minimized .numpad {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bottom-area.minimized .grand-total-bar {
+  padding: 16px 24px;
+}
+
+.numpad-spacer {
+  height: 380px;
+  transition: height 0.3s ease;
+}
+
+.num-minimized .numpad-spacer {
+  height: 100px;
 }
 
 .key {
