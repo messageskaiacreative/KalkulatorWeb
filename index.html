@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>KalkulatorHarga</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#F9FAFB">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div id="app">
+    <header class="app-header">
+      <h1>KalkulatorHarga</h1>
+      <div class="header-controls">
+        <button class="icon-btn" id="info-btn" aria-label="Informasi">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+          </svg>
+        </button>
+        <div class="tax-toggle">
+          <div class="tax-rate-edit">
+            <div class="custom-input minimal-percent" id="tax-rate-input" data-max="2" tabindex="0">12</div>
+            <label for="tax-switch">PPN</label>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="tax-switch">
+            <span class="slider"></span>
+          </label>
+        </div>
+    </header>
+
+    <main class="scrollable-content">
+      <!-- Budget Track area -->
+      <section class="budget-card">
+        <div class="budget-header">
+          <span class="label">Tentukan Budget(Opsional)</span>
+          <div class="custom-input currency" id="budget-input" data-max="15">0</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="budget-fill"></div>
+        </div>
+      </section>
+
+      <!-- Calculation Form -->
+      <section class="calc-card">
+        <div class="tabs">
+          <button class="tab active" data-target="standard">Standar</button>
+          <button class="tab" data-target="tiered">Bertingkat</button>
+          <button class="tab" data-target="bogo">BOGO</button>
+        </div>
+
+        <div class="tab-content active" id="tab-standard">
+          <div class="input-group">
+            <label>Harga Awal</label>
+            <div class="custom-input currency active-input" id="std-base" data-max="15" tabindex="0">0</div>
+          </div>
+          <div class="input-group">
+            <label>Diskon %</label>
+            <div class="custom-input border percent" id="std-disc" data-max="3" tabindex="0">0</div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-tiered">
+          <div class="input-group">
+            <label>Harga Awal</label>
+            <div class="custom-input currency" id="trd-base" data-max="15" tabindex="0">0</div>
+          </div>
+          <div class="row-group">
+            <div class="input-group">
+              <label>Diskon 1 (%)</label>
+              <div class="custom-input percent" id="trd-disc1" data-max="3" tabindex="0">0</div>
+            </div>
+            <div class="input-group">
+              <label>Diskon 2 (%)</label>
+              <div class="custom-input percent" id="trd-disc2" data-max="3" tabindex="0">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-bogo">
+          <div class="input-group">
+            <label>Harga Satuan</label>
+            <div class="custom-input currency" id="bgo-price" data-max="15" tabindex="0">0</div>
+          </div>
+          <div class="row-group">
+            <div class="input-group">
+              <label>Jml Dibayar</label>
+              <div class="custom-input qty" id="bgo-paid" data-max="4" tabindex="0">0</div>
+            </div>
+            <div class="input-group">
+              <label>Jml Didapat</label>
+              <div class="custom-input qty" id="bgo-recv" data-max="4" tabindex="0">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-area">
+          <div class="result-details">
+            <span class="label" id="result-label">Harga Akhir</span>
+            <div class="final-price" id="result-price">Rp 0</div>
+            <div class="sub-text" id="result-subtext"></div>
+          </div>
+          <button id="add-to-cart-btn" class="btn-primary" aria-label="Add to cart">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+              viewBox="0 0 24 24">
+              <path d="M12 4v16m8-8H4"></path>
+            </svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Cart Area -->
+      <section class="cart-card">
+        <div class="cart-header">
+          <h2>Keranjang</h2>
+          <span id="cart-count">0 barang</span>
+        </div>
+        <ul id="cart-list" class="cart-list">
+          <!-- Dynamically populated -->
+        </ul>
+      </section>
+
+      <!-- Spacer to compensate for absolute bottom numpad -->
+      <div style="height: 380px;"></div>
+    </main>
+
+    <!-- Fixed Bottom Controls -->
+    <div class="bottom-area">
+      <div class="grand-total-bar">
+        <span>Total Belanja</span>
+        <strong id="grand-total-val">Rp 0</strong>
+      </div>
+
+      <div class="numpad">
+        <button class="key" data-action="1">1</button>
+        <button class="key" data-action="2">2</button>
+        <button class="key" data-action="3">3</button>
+        <button class="key action" data-action="backspace" aria-label="Backspace">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M21 4H8l-7 8 7 8h13a2 2 0 002-2V6a2 2 0 00-2-2z"></path>
+            <line x1="18" y1="9" x2="12" y2="15"></line>
+            <line x1="12" y1="9" x2="18" y2="15"></line>
+          </svg>
+        </button>
+
+        <button class="key" data-action="4">4</button>
+        <button class="key" data-action="5">5</button>
+        <button class="key" data-action="6">6</button>
+        <button class="key action" data-action="clear">C</button>
+
+        <button class="key" data-action="7">7</button>
+        <button class="key" data-action="8">8</button>
+        <button class="key" data-action="9">9</button>
+        <button class="key action" data-action="000">000</button>
+
+        <button class="key zero" data-action="0">0</button>
+        <button class="key action enter-key" data-action="next" aria-label="Next">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="info-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>Panduan Kalkulasi</h2>
+        <button class="modal-close" id="close-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="info-item">
+          <strong>Standar</strong>
+          <p>Potongan diskon biasa. Contoh: Harga Rp 100.000 diskon 20%, maka cukup bayar Rp 80.000.</p>
+        </div>
+        <div class="info-item">
+          <strong>Bertingkat</strong>
+          <p>Diskon berganda (X% + Y%). Diskon Y% dihitung dari harga <i>setelah</i> diskon X% diterapkan. Contoh: Baju diskon 50% + 20%. Ini <b>BUKAN</b> diskon 70%, melainkan harga dipotong 50% dahulu, barulah hasilnya dipotong lagi 20%.</p>
+        </div>
+        <div class="info-item">
+          <strong>BOGO (Buy X Get Y)</strong>
+          <p>Beli X bayar Y (Contoh: Beli 2 gratis 1). Masukkan jumlah barang yang dibayar (misal 2) dan total barang yang didapat (misal 3). Kalkulator ini akan memberikan perincian harga per-barang agar Anda tahu mana promo yang paling untung.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
