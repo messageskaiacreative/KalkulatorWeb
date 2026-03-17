@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Focus the first input of the newly selected tab
                 const firstInput = document.querySelector(`#tab-${target} .custom-input`);
                 setActiveInput(firstInput);
+                if (typeof toggleNumpad === 'function') toggleNumpad(true);
                 calculateCurrent();
             });
         });
@@ -63,10 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
             el.addEventListener('touchstart', (e) => {}, {passive: true});
         });
 
-        // Custom Inputs Focus
-        document.querySelectorAll('.custom-input').forEach(input => {
-            input.addEventListener('click', () => setActiveInput(input));
-        });
+        // Custom Inputs Focus - handled separately above for auto-show
+    
 
         // Tax Toggle
         taxSwitch.addEventListener('change', (e) => {
@@ -101,6 +100,69 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Numpad Visibility Toggle listeners
+        const toggleBtn = document.getElementById('toggle-numpad-btn');
+        const bottomArea = document.querySelector('.bottom-area');
+        const grandTotalBar = document.querySelector('.grand-total-bar');
+
+        if (toggleBtn && bottomArea) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleNumpad();
+            });
+
+            grandTotalBar.addEventListener('click', () => {
+                if (bottomArea.classList.contains('minimized')) {
+                    toggleNumpad(true);
+                }
+            });
+        }
+
+        // Auto-show numpad on input click
+        document.querySelectorAll('.custom-input').forEach(input => {
+            input.addEventListener('click', () => {
+                setActiveInput(input);
+                toggleNumpad(true);
+            });
+        });
+
+    }
+
+    // ---- TOGGLE NUMPAD LOGIC ----
+    function toggleNumpad(show) {
+        const bottomArea = document.querySelector('.bottom-area');
+        const toggleBtn = document.getElementById('toggle-numpad-btn');
+        if (!bottomArea) return;
+
+        const isCurrentlyMinimized = bottomArea.classList.contains('minimized');
+        const shouldShow = typeof show === 'boolean' ? show : isCurrentlyMinimized;
+
+        if (shouldShow) {
+            bottomArea.classList.remove('minimized');
+            document.body.classList.remove('num-minimized');
+            if (toggleBtn) {
+                toggleBtn.classList.remove('rotated');
+                toggleBtn.innerHTML = `
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+                  </svg>
+                `;
+            }
+        } else {
+            bottomArea.classList.add('minimized');
+            document.body.classList.add('num-minimized');
+            if (toggleBtn) {
+                toggleBtn.classList.add('rotated');
+                toggleBtn.innerHTML = `
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round" viewBox="0 0 24 24">
+                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                    <path d="M7 8h.01M12 8h.01M17 8h.01M7 12h.01M12 12h.01M17 12h.01M7 16h.01M12 16h.01M17 16h.01"/>
+                  </svg>
+                `;
+            }
+        }
     }
 
     // ---- INPUT LOGIC ----
