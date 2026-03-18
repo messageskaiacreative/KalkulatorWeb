@@ -408,12 +408,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Register Service Worker
+    // ---- SERVICE WORKER & AUTO-UPDATE ----
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
-                .then(() => console.log('SW Registered'))
-                .catch(e => console.error('SW Error', e));
+                .then(registration => {
+                    console.log('SW Registered');
+
+                    // Check for updates every time the app is opened
+                    registration.update();
+
+                    // Listen for updates - if a new SW is found
+                    registration.onupdatefound = () => {
+                        const installingWorker = registration.installing;
+                        if (installingWorker) {
+                            installingWorker.onstatechange = () => {
+                                if (installingWorker.state === 'installed') {
+                                    if (navigator.serviceWorker.controller) {
+                                        // New content is available; please refresh.
+                                        console.log('New content available, reloading...');
+                                        // Optional: You could show a "New Update Available" toast here
+                                        // But per your request for "automatic", we'll just reload.
+                                        window.location.reload();
+                                    }
+                                }
+                            };
+                        }
+                    };
+                })
+                .catch(error => console.error('SW Error:', error));
+        });
+
+        // Ensure that a page reload properly triggers the new service worker
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                window.location.reload();
+                refreshing = true;
+            }
         });
     }
+
 });
